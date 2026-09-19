@@ -36,7 +36,7 @@ The first version focuses on **batch processing of historical flight data**. A f
                   Glue Data Catalog
                             │
                             ▼
-                     Amazon Athena
+                     Aws Redshift
                             │
                             ▼
                       SQL Analytics
