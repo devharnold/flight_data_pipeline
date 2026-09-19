@@ -1,4 +1,4 @@
-# SkyStream ✈️
+# SkyStream
 
 ## AWS Flight Data Engineering Pipeline
 
@@ -324,7 +324,7 @@ Planned resources include:
 * IAM roles
 * IAM policies
 * AWS Glue resources
-* Athena configuration
+* Redshift Config
 * CloudWatch resources
 
 The goal is to make the infrastructure reproducible rather than manually creating everything through the AWS console.
