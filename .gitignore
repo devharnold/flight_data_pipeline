@@ -1,6 +1,100 @@
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 .venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+
+# Environment & Secrets
 .env
 .env.*
+!.env.example
+*.pem
+*.key
+
+
+# Logs
 *.log
+logs/
+
+
+# Jupyter
+.ipynb_checkpoints/
+
+
+# Apache Airflow
+airflow/logs/
+airflow/airflow.db
+airflow/airflow.cfg
+airflow/webserver_config.py
+airflow/__pycache__/
+
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+dbt/.user.yml
+dbt/.cache/
+
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+
+# Docker
+docker-compose.override.yml
+
+
+# Data files
+*.csv
+*.csv.gz
+*.parquet
+*.json
+*.jsonl
+*.avro
+*.orc
+*.duckdb
+*.db
+*.sqlite
+*.sqlite3
+
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+# OS
+.DS_Store
+Thumbs.db
+
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
