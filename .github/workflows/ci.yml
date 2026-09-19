@@ -1,38 +1,75 @@
-name: Sky Stream CI Pipeline
+name: Sky Stream CI
 
 on:
-    pull_request:
-        branches: [main, develop]
+  pull_request:
+    branches:
+      - main
+      - develop
 
 jobs:
-    validate:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-            uses: actions/checkout@v4
+  python:
+    name: Python Validation
+    runs-on: ubuntu-latest
 
-            - name: Set up Python
-            uses: actions/setup-python@v5
-            with:
-                python-version: '3.12'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Install dependencies
-            run: |
-                pip install -r requirements.txt
-                pip install pytest pylint sqlfluff great-expectations
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
 
-            - name: Lint python code
-            run: pylint flight_data_pipeline/
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pylint
 
-            #- name: Lint SQL code
-            #run: sqlfluff lint dbt/../models
+      - name: Lint Python
+        run: |
+          pylint flight_data_pipeline/
 
-            - name: Run unit tests
-            run: pytest tests/unit/
+      - name: Run unit tests
+        run: |
+          pytest tests/unit/ -v
 
-            - name: Run Data Quality Checks
-            run: |
-            # Example: validate a specific dataset
-            great expectations suite validate \
-            --suite my_data_suite
-            --data_source my_data_source
+  dbt:
+    name: dbt Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dbt
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-redshift
+          pip install sqlfluff sqlfluff-templater-dbt
+
+      - name: Check dbt version
+        run: |
+          dbt --version
+
+      - name: Parse dbt project
+        working-directory: dbt
+        run: |
+          dbt parse
+
+      - name: Compile dbt project
+        working-directory: dbt
+        run: |
+          dbt compile
+
+      - name: Lint SQL
+        working-directory: dbt
+        run: |
+          sqlfluff lint models/
