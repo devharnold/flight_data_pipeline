@@ -1,0 +1,38 @@
+name: Sky Stream CI Pipeline
+
+on:
+    pull_request:
+        branches: [main, develop]
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+            uses: actions/checkout@v4
+
+            - name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.12'
+
+            - name: Install dependencies
+            run: |
+                pip install -r requirements.txt
+                pip install pytest pylint sqlfluff great-expectations
+
+            - name: Lint python code
+            run: pylint flight_data_pipeline/
+
+            #- name: Lint SQL code
+            #run: sqlfluff lint dbt/../models
+
+            - name: Run unit tests
+            run: pytest tests/unit/
+
+            - name: Run Data Quality Checks
+            run: |
+            # Example: validate a specific dataset
+            great expectations suite validate \
+            --suite my_data_suite
+            --data_source my_data_source

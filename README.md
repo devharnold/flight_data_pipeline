@@ -348,23 +348,23 @@ The project will follow basic AWS security practices:
 
 ### Phase 1: Historical Batch Pipeline
 
-* [ ] Select flight dataset
-* [ ] Explore dataset and schema
-* [ ] Create AWS account resources
-* [ ] Create S3 data lake
-* [ ] Build Python ingestion
-* [ ] Upload raw data to S3
-* [ ] Implement data validation
-* [ ] Build PySpark transformations
-* [ ] Convert data to Parquet
-* [ ] Create staging layer
-* [ ] Come up with final data marts
-* [ ] Configure Glue Data Catalog
-* [ ] Query data with Athena
-* [ ] Add Airflow orchestration
-* [ ] Add Terraform
-* [ ] Add monitoring and logging
-* [ ] Document architecture and results
+* Select flight dataset
+* Explore dataset and schema
+* Create AWS account resources
+* Create S3 data lake
+* Build Python ingestion
+* Upload raw data to S3
+* Implement data validation
+* Build PySpark transformations
+* Convert data to Parquet
+* Create staging layer
+* Come up with final data marts
+* Configure Glue Data Catalog
+* Query data with Redshift
+* Add Airflow orchestration
+* Add Terraform
+* Add monitoring and logging
+* Document architecture and results
 
 ### Phase 2: Incremental Flight Pipeline
 
@@ -372,27 +372,27 @@ The second phase will extend SkyStream beyond historical batch processing.
 
 Planned improvements:
 
-* [ ] Integrate a flight/aviation API
-* [ ] Implement incremental ingestion
-* [ ] Handle API pagination
-* [ ] Handle rate limits
-* [ ] Track ingestion state
-* [ ] Process newly received flight records
-* [ ] Handle changing flight status
-* [ ] Improve monitoring
-* [ ] Add automated data quality checks
+* Integrate a flight/aviation API
+* Implement incremental ingestion
+* Handle API pagination
+* Handle rate limits
+* Track ingestion state
+* Process newly received flight records
+* Handle changing flight status
+* Improve monitoring
+* Add automated data quality checks
 
 ### Phase 3: Advanced Processing
 
 Potential future extensions:
 
-* [ ] Larger-scale PySpark workloads
-* [ ] Streaming ingestion
-* [ ] Apache Kafka
-* [ ] AWS streaming services
-* [ ] Near-real-time analytics
-* [ ] Flight delay dashboard
-* [ ] Cost and performance optimization
+* Larger-scale PySpark workloads
+* Streaming ingestion
+* Apache Kafka
+* AWS streaming services
+* Near-real-time analytics
+* Flight delay dashboard
+* Cost and performance optimization
 
 ---
 
