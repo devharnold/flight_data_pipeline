@@ -98,3 +98,9 @@ Thumbs.db
 *.tmp
 *.temp
 *.bak
+
+
+# Raw datasets
+dataset/*.zip
+dataset/*.csv
+dataset/*.parquet
