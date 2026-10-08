@@ -2,7 +2,8 @@ import pandas as pd
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATASETS = PROJECT_ROOT / "datasets"
+DATASETS_DIR = PROJECT_ROOT / "datasets"
+PARQUET_DIR = PROJECT_ROOT / "data" / "parquet"
 
 # Skip formatting data type: Lets be evil and trust what's there, We'll eventually transform it anyway
 AIRPORT_DATA = "dataset/airports.csv"
@@ -51,22 +52,31 @@ DATASETS = {
             }
 
 
-def extract_data_from_csv(dataset: str):
+def extract_data_from_csv(dataset: str) -> pd.DataFrame:
+    # Read a csv file into a Data Frame
     config = DATASETS[dataset]
 
     df = pd.read_csv(config["file"])
     print(f"Extracted {len(df)} rows from {config['file']}")
 
-    return dataset
+    return df
 
-def transform_data_from_csv(dataset: str):
+def transform_data_from_csv(dataset: str, df: pd.DataFrame) -> str:
+    df = pd.read_json(data)
+    df = df.drop_duplicates()
+
     config = DATASETS[dataset]
 
     df = pd.read_csv(config["file"])
     before = len(df)
 
     df = df.drop_duplicates()
-    after = len(def)
+    after = len(df)
+
+    config["parquet_file"].parent.mkdir(
+            parents=True,
+            exists_ok=True
+        )
 
     df.to_parquet(
             config["parquet_file"],
@@ -80,5 +90,9 @@ def transform_data_from_csv(dataset: str):
     print(f"Rows after: {after}")
     print(f"Parquet file: {config['parquet_file']}")
 
-    return dataset
+    return str(config["parquet_file"])
+
+def get_s3_key(dataset: str) -> str:
+    # Returns the S3 destination key for a dataset
+    return DATASETS[dataset]["s3_Key"]
 
