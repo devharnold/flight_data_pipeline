@@ -1,98 +1,93 @@
-import pandas as pd
+
 from pathlib import Path
 
+import pandas as pd
+
+
+# Project paths
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATASETS_DIR = PROJECT_ROOT / "datasets"
 PARQUET_DIR = PROJECT_ROOT / "data" / "parquet"
 
-# Skip formatting data type: Lets be evil and trust what's there, We'll eventually transform it anyway
-AIRPORT_DATA = "dataset/airports.csv"
-AIRPORT_COMMENTS_DATA = "dataset/airport_comments.csv"
-AIRPORT_FREQUENCIES_DATA = "dataset/airport_frequencies.csv"
-COUNTRIES_DATA = "dataset/countries.csv"
-NAVAIDS_DATA = "dataset/navaids.csv"
-REGIONS_DATA = "dataset/regions.csv"
-RUNWAYS_DATA = "dataset/runways.csv"
+# Dataset name -> source CSV, output Parquet file, and S3 key.
+DATASET_NAMES = [
+    "airports",
+    "airport-comments",
+    "airport-frequencies",
+    "countries",
+    "navaids",
+    "regions",
+    "runways",
+]
 
 DATASETS = {
-        "airports": {
-            "file": AIRPORT_DATA,
-            "parquet_file": "",
-            "s3_Key": "airport/raw/airport.parquet",
-            },
-        "airport_comments": {
-                "file": AIRPORT_COMMENTS_DATA,
-                "parquet_file": "",
-                "s3_Key": "airport_comments/raw/airport_comments.parquet",
-                },
-        "airport_frequencies": {
-            "file": AIRPORT_FREQUENCIES_DATA,
-            "parquet_file": "",
-            "s3_Key": "airport_frequencies/raw/airport_frequencies.parquet",
-            },
-        "countries": {
-            "file": COUNTRIES_DATA,
-            "parquet_file": "/opt/airflow/...",
-            "s3_Key": "countries_data/raw/countries.parquet",
-            },
-        "navaids": {
-            "file": NAVAIDS_DATA,
-            "parquet_file": "",
-            "s3_Key": "navaids/raw/navaids.parquet",
-            },
-        "regions": {
-            "file": REGIONS_DATA,
-            "parquet_file": "",
-            "s3_Key": "regions/raw/regions.parquet",
-            },
-        "runways": {
-            "file": RUNWAYS_DATA,
-            "parquet_file": "",
-            "s3_Key": "runways/raw/runways.parquet",
-            }
+    name: {
+        "file": DATASETS_DIR / f"{name}.csv",
+        "parquet_file": PARQUET_DIR / f"{name}.parquet",
+        "s3_key": f"{name}/raw/{name}.parquet",
+    }
+    for name in DATASET_NAMES
+}
+
+
+def get_dataset_config(dataset: str) -> dict:
+    """Return configuration for a known dataset."""
+    if dataset not in DATASETS:
+        raise ValueError(
+            f"Unknown dataset: {dataset}. "
+            f"Available datasets: {', '.join(DATASETS)}"
+        )
+
+    return DATASETS[dataset]
 
 
 def extract_data_from_csv(dataset: str) -> pd.DataFrame:
-    # Read a csv file into a Data Frame
-    config = DATASETS[dataset]
+    """Read a dataset CSV file into a pandas DataFrame."""
+    config = get_dataset_config(dataset)
+    csv_path = config["file"]
 
-    df = pd.read_csv(config["file"])
-    print(f"Extracted {len(df)} rows from {config['file']}")
+    if not csv_path.is_file():
+        raise FileNotFoundError(
+            f"CSV file not found: {csv_path}. "
+            "Check the datasets directory and Docker volume mounts."
+        )
+
+    df = pd.read_csv(csv_path)
+
+    print(f"Extracted {len(df)} rows from {csv_path}")
 
     return df
 
+
 def transform_data_from_csv(dataset: str, df: pd.DataFrame) -> str:
-    df = pd.read_json(data)
-    df = df.drop_duplicates()
+    # Deduplicate a DataFrame, save it as Parquet, and return its path.
+    config = get_dataset_config(dataset)
+    parquet_path = config["parquet_file"]
 
-    config = DATASETS[dataset]
-
-    df = pd.read_csv(config["file"])
     before = len(df)
 
-    df = df.drop_duplicates()
-    after = len(df)
+    transformed_df = df.drop_duplicates()
 
-    config["parquet_file"].parent.mkdir(
-            parents=True,
-            exists_ok=True
-        )
+    after = len(transformed_df)
 
-    df.to_parquet(
-            config["parquet_file"],
-            engine="pyarrow",
-            compression="snappy",
-            index=False,
-            )
+    parquet_path.parent.mkdir(parents=True, exist_ok=True)
+
+    transformed_df.to_parquet(
+        parquet_path,
+        engine="pyarrow",
+        compression="snappy",
+        index=False,
+    )
 
     print(f"Transformation complete for {dataset}")
-    print(f"Rows before: {before}")
-    print(f"Rows after: {after}")
-    print(f"Parquet file: {config['parquet_file']}")
+    print(f"Rows before deduplication: {before}")
+    print(f"Rows after deduplication: {after}")
+    print(f"Parquet file: {parquet_path}")
 
-    return str(config["parquet_file"])
+    return str(parquet_path)
 
-def get_s3_key(dataset: str) -> str:
-    # Returns the S3 destination key for a dataset
-    return DATASETS[dataset]["s3_Key"]
 
+if __name__ == "__main__":
+    for dataset in DATASET_NAMES:
+        dataframe = extract_data_from_csv(dataset)
+        transform_data_from_csv(dataset, dataframe)
